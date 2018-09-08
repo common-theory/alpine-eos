@@ -33,9 +33,11 @@ RUN git clone --depth 1 --single-branch --branch boost-1.67.0 https://github.com
 
 # Build EOS
 RUN git clone --depth 1 --single-branch --branch v1.2.4 https://github.com/EOSIO/eos.git \
- && mkdir /eos/build \
+ && cd /eos \
+ && git submodule update --init --recursive
+
+RUN mkdir /eos/build \
  && cd /eos/build \
- && git submodule update --init --recursive \
  && find /eos -type f -exec sed -i 's/find_package(LLVM 4.0/find_package(LLVM 5.0/g' {} + \
  && cmake -DLLVM_DIR=/opt/wasm/lib/cmake/llvm -DWASM_ROOT=/opt/wasm -DOPENSSL_ROOT_DIR=/usr/include/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DBUILD_MONGO_DB_PLUGIN=false -DCMAKE_BUILD_TYPE=Release .. \
- && make -j$( nproc )
+ && make
