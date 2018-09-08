@@ -6,13 +6,13 @@ RUN apk add --no-cache bash ncurses g++ automake make cmake openssl libressl-dev
  && git config --global advice.detachedHead false
 
 # Install secp256k1 binary
-RUN git clone --depth 1 --single-branch https://github.com/bitcoin-core/secp256k1.git \
- && cd /secp256k1 \
- && bash ./autogen.sh \
- && bash ./configure \
+RUN git clone --depth 1 --single-branch https://github.com/cryptonomex/secp256k1-zkp.git /secp256k1-zkp \
+ && cd /secp256k1-zkp \
+ && bash autogen.sh \
+ && ./configure \
  && make \
  && make install \
- && rm -rf /secp256k1
+ && rm -rf /secp256k1-zkp
 
 # Build llvm 5.0 (5.0 includes a fix for musl based libc)
 RUN git clone --depth 1 --single-branch --branch release_50 https://github.com/llvm-mirror/llvm.git /llvm \
@@ -27,7 +27,8 @@ RUN git clone --depth 1 --single-branch --branch boost-1.67.0 https://github.com
  && cd /boost \
  && git submodule update --init --recursive \
  && bash ./bootstrap.sh \
- && ./b2 install --prefix=/usr --variant=release \
+# Boost exits with status code 1 because of this issue https://stackoverflow.com/questions/12906829/failed-updating-58-targets-when-trying-to-build-boost-what-happened/16315499
+ && ./b2 install --prefix=/usr --variant=release || true \
  && rm -rf /boost
 
 # Build EOS
@@ -35,5 +36,6 @@ RUN git clone --depth 1 --single-branch --branch v1.2.4 https://github.com/EOSIO
  && mkdir /eos/build \
  && cd /eos/build \
  && git submodule update --init --recursive \
+ && find /eos -type f -exec sed -i 's/find_package(LLVM 4.0/find_package(LLVM 5.0/g' {} + \
  && cmake -DLLVM_DIR=/opt/wasm/lib/cmake/llvm -DWASM_ROOT=/opt/wasm -DOPENSSL_ROOT_DIR=/usr/include/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DBUILD_MONGO_DB_PLUGIN=false -DCMAKE_BUILD_TYPE=Release .. \
  && make -j$( nproc )
