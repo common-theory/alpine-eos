@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  - build_push:
+  build_push:
     machine:
       enabled: true
     steps:
