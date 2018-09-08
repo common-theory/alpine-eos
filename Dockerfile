@@ -1,8 +1,8 @@
 FROM alpine:edge
 MAINTAINER Chance Hudson <chance@commontheory.io>
 
-RUN apk add --no-cache bash ncurses g++ automake make cmake openssl \
-libressl-dev autoconf libtool python binaryen git gmp-dev \
+RUN apk add --no-cache bash ncurses g++ automake make cmake openssl libressl-dev autoconf libtool python binaryen git gmp-dev gettext gettext-dev libintl doxygen linux-headers \
+ && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mongo-c-driver-dev libbson-dev \
  && git config --global advice.detachedHead false
 
 # Install secp256k1 binary
@@ -11,7 +11,6 @@ RUN git clone --depth 1 --single-branch https://github.com/bitcoin-core/secp256k
  && bash ./autogen.sh \
  && bash ./configure \
  && make \
- && ./tests \
  && make install \
  && rm -rf /secp256k1
 
@@ -23,17 +22,18 @@ RUN git clone --depth 1 --single-branch --branch release_50 https://github.com/l
  && cmake --build build --target install \
  && rm -rf /llvm
 
-# Build boost v1.57.0
-RUN git clone --depth 1 --single-branch --branch boost-1.57.0 https://github.com/boostorg/boost /boost \
+# Build boost v1.67.0
+RUN git clone --depth 1 --single-branch --branch boost-1.67.0 https://github.com/boostorg/boost /boost \
  && cd /boost \
  && git submodule update --init --recursive \
  && bash ./bootstrap.sh \
- && ./b2 --variant=release install \
+ && ./b2 install --prefix=/usr --variant=release \
  && rm -rf /boost
 
 # Build EOS
 RUN git clone --depth 1 --single-branch --branch v1.2.4 https://github.com/EOSIO/eos.git \
  && mkdir /eos/build \
  && cd /eos/build \
- && git submodule update --init --recursive
-# && cmake -DWASM_ROOT=/opt/wasm -DOPENSSL_ROOT_DIR=/usr/include/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DBUILD_MONGO_DB_PLUGIN=true -DCMAKE_BUILD_TYPE=Release ..
+ && git submodule update --init --recursive \
+ && cmake -DLLVM_DIR=/opt/wasm/lib/cmake/llvm -DWASM_ROOT=/opt/wasm -DOPENSSL_ROOT_DIR=/usr/include/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DBUILD_MONGO_DB_PLUGIN=false -DCMAKE_BUILD_TYPE=Release .. \
+ && make -j$( nproc )
