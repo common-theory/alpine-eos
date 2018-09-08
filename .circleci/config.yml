@@ -5,10 +5,15 @@ jobs:
       enabled: true
     steps:
       - checkout
-      - run: |
-        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        docker build . -t commontheory/alpine-eos:latest
-        docker push -t commontheory/alpine-eos:latest
+      - run:
+          name: Docker Login
+          command: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - run:
+          name: Build Docker Image
+          command: docker build . -t commontheory/alpine-eos:latest
+      - run:
+          name: Push Docker Image
+          command: docker push -t commontheory/alpine-eos:latest
 workflows:
   version: 2
   build-push:
