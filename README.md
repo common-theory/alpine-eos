@@ -1,3 +1,3 @@
-# alpine-eos [![Build Status](https://travis-ci.org/common-theory/alpine-eos.svg?branch=master)](https://travis-ci.org/common-theory/alpine-eos)
+# alpine-eos [![CircleCI](https://circleci.com/gh/common-theory/alpine-eos/tree/master.svg?style=shield)](https://circleci.com/gh/common-theory/alpine-eos/tree/master)
 
 A minimal docker image including the eos executables.
