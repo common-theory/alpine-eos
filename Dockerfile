@@ -19,7 +19,7 @@ RUN git clone --depth 1 --single-branch https://github.com/cryptonomex/secp256k1
 RUN git clone --depth 1 --single-branch --branch release_40 https://github.com/common-theory/llvm.git /llvm \
  && git clone --depth 1 --single-branch --branch release_40 https://github.com/llvm-mirror/clang.git /llvm/tools/clang \
  && cd /llvm \
- && cmake -H. -Bbuild -DCMAKE_INSTALL_PREFIX=/usr -DLLVM_TARGETS_TO_BUILD= -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=WebAssembly -DCMAKE_BUILD_TYPE=Release  \
+ && cmake -H. -Bbuild --DLLVM_ENABLE_RTTI=ON -DCMAKE_INSTALL_PREFIX=/usr -DLLVM_TARGETS_TO_BUILD= -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=WebAssembly -DCMAKE_BUILD_TYPE=Release  \
  && cmake --build build --target install \
  && rm -rf /llvm
 
