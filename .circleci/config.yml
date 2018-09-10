@@ -33,12 +33,12 @@ workflows:
   build-push:
     jobs:
       - build_push_llvm:
-          requires:
-            - build_push
           filters:
             branches:
               only: master
       - build_push:
+          requires:
+            - build_push_llvm
           filters:
             branches:
               only: master
