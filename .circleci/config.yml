@@ -33,7 +33,7 @@ workflows:
   build-push:
     jobs:
       - build_push_llvm:
-          depends:
+          requires:
             - build_push
           filters:
             branches:
