@@ -1,5 +1,19 @@
 version: 2
 jobs:
+  build_push_llvm:
+    machine:
+      enabled: true
+    steps:
+      - checkout
+      - run:
+          name: Docker Login
+          command: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - run:
+          name: Build LLVM 4.0 Docker Image
+          command: docker build ./alpine-llvm-4 -t commontheory/alpine-llvm-4:latest
+      - run:
+          name: Push LLVM 4.0 Docker Image
+          command: docker push commontheory/alpine-llvm-4:latest
   build_push:
     machine:
       enabled: true
@@ -13,11 +27,17 @@ jobs:
           command: docker build . -t commontheory/alpine-eos:latest
       - run:
           name: Push Docker Image
-          command: docker push -t commontheory/alpine-eos:latest
+          command: docker push comontheory/alpine-eos:latest
 workflows:
   version: 2
   build-push:
     jobs:
+      - build_push_llvm:
+          depends:
+            - build_push
+          filters:
+            branches:
+              only: master
       - build_push:
           filters:
             branches:
